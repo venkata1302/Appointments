@@ -1,4 +1,4 @@
-# ATT
+# Appointments
 
 # Installation
 
