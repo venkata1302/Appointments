@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+    </br>
+    {# Form for adding appointments  #}
+    <form id = "Add_form"  method = "POST" action = {% url 'add_appointment' %} >
+            {% csrf_token %}
+            <input type = "submit" value = "ADD" id = "Add_button"></input>
+            <input type = "button" value = "CANCEL" id = "cancel_button"></input>
+            </br>
+            </br>
+            <label> DATE </label>
+            <input type = "date" name = "date" required> </input>
+            </br>
+            <label> TIME </label>
+            <input type = "time" name = "time" required> </input>
+            </br>
+            <label> DESC </label>
+            <input type = "text" name = "desc" required> </input>
+    </form>
+    {# Form for searching Appointments based on description #}
+    <form id = "search_form" method = "POST" >
+    {% csrf_token %}
+    <input type = "button" id = "new_button" value = "NEW"></input>
+    </br>
+    </br>
+    <input type = "text"  name = "search" id = "search_text"></input>
+    <input type = "submit" value = "Search" id = "search_button"></input>
+    </form>
+    </br>
+
+    <div id = "mydiv">
+        < appointments table will be here>
+    </div>
+    {# Appointments Table based on our search  #}
+    <div id="showData">
+        <div class="container">
+            <div class="row col-md-7 table-responsive">
+                <table id="appointmentTable" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>DATE</th>
+                            <th>TIME</th>
+                            <th>DESCRIPTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    //For getting CSRF token
+    function getCookie(name) {
+           var cookieValue = null;
+           if (document.cookie && document.cookie != '') {
+             var cookies = document.cookie.split(';');
+             for (var i = 0; i < cookies.length; i++) {
+             var cookie = jQuery.trim(cookies[i]);
+             // Does this cookie string begin with the name we want?
+             if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                 break;
+              }
+         }
+     }
+        return cookieValue;
+    }
+
+    $(document).ready(function(){
+        $("#Add_form").hide();
+        $("#showData").hide();
+        $("#new_button").click(function(d){
+            d.preventDefault();
+            $("#Add_form").show();
+            $("#new_button").hide();
+
+        });
+        $("#cancel_button").click(function(g){
+            g.preventDefault();
+            $("#Add_form").hide();
+            $("#new_button").show();
+
+        });
+        $("#search_button").click(function(e) {
+            e.preventDefault();
+            $("#showData").show();
+            getAppointments();
+        });
+        });
+
+        function getAppointments() {
+            var csrftoken = getCookie('csrftoken');
+            var x = document.getElementById("mydiv");
+            x.innerHTML = "";
+            var y = $("#search_text").val();
+            $.ajax({
+                type: "POST",
+                url: "/search/",
+                data: {csrfmiddlewaretoken: csrftoken, search_data: y},
+                success: function (data) {
+                    console.log(data);
+                    $("#appointmentTable tbody").empty();
+                    $.each(data, function(i, appointment){
+                        var number = i +1;
+                        var appointmentRow = '<tr>' +
+                                                '<td>' + number + '</td>' +
+                                                '<td>' + appointment.date + '</td>' +
+                                                '<td>' + appointment.time + '</td>' +
+                                                '<td>' + appointment.description + '</td>' +
+                                              '</tr>';
+                        $('#appointmentTable tbody').append(appointmentRow);
+                    });
+                    $( "#appointmentTable tbody tr:odd" ).addClass("light");
+                    $( "#appointmentTable tbody tr:even" ).addClass("active");
+                }
+            });
+        }
+    </script>
+
+
+</body>
+</html>
