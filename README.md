@@ -17,6 +17,7 @@ $ pip install -r requires.txt
 
 ### 4. Migrate
 $ python manage.py makemigrations Appointments
+
 $ python manage.py migrate Appointments
 
 
