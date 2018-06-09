@@ -16,7 +16,9 @@ $ source bin/activate
 $ pip install -r requires.txt
 
 ### 4. Migrate
-$ python manage.py migrate
+$ python manage.py makemigrations Appointments
+$ python manage.py migrate Appointments
+
 
 ### 5. Run
 $ python manage.py runserver
